@@ -1,93 +1,48 @@
-const fs = require("fs");
+const { readFile, writeFile } = require("fs").promises;
+const { randomUUID } = require("crypto");
 const path = require("path");
 
-const contactsPath = path.resolve("./db/contacts.json");
+const contactsPath = path.relative(__dirname, "db/contacts.json");
 
-function listContacts() {
-  fs.readFile(contactsPath, "utf-8", (error, data) => {
-    if (error) {
-      return console.log(error);
-    }
-
-    const contacts = JSON.parse(data);
-    console.log("List of contacts: ");
-    console.table(contacts);
-  });
+async function listContacts() {
+  const data = await readFile(contactsPath, "utf-8");
+  return JSON.parse(data);
 }
 
-function getContactById(contactId) {
-  fs.readFile(contactsPath, "utf-8", (error, data) => {
-    if (error) {
-      return console.log(error);
+async function getContactById(contactId) {
+  const contacts = await listContacts();
+
+  for (const el of contacts) {
+    if (el.id == contactId) {
+      return el;
     }
+  }
 
-    const contacts = JSON.parse(data);
-
-    const contact = contacts.find((contact) => {
-      if (contact.id === contactId) {
-        console.log(`Get contact by ID ${contactId}:`);
-        console.table(contact);
-        return contact;
-      }
-    });
-
-    if (contact == null) {
-      console.log(`Contact with ID "${contactId}" not found!`);
-    }
-  });
+  throw new Error(`Contact with id: ${contactId} not found. Try different id.`);
 }
 
-function removeContact(contactId) {
-  fs.readFile(contactsPath, "utf-8", (error, data) => {
-    if (error) {
-      return console.log(error);
-    }
+async function addContact(name, email, phone) {
+  if (!name || !email || !phone) {
+    throw new Error("Please fill all fields to add a new contact!");
+  }
 
-    const contacts = JSON.parse(data);
-    const newContact = contacts.filter((contact) => contact.id !== contactId);
-
-    if (newContact.length === contacts.length) {
-      console.log(
-        `Contact with ID "${contactId}" don't removed! ID "${contactId}" not found!`
-      );
-      return;
-    }
-
-    console.log("Contact deleted successfully! New list of contacts: ");
-    console.table(newContact);
-
-    fs.writeFile(contactsPath, JSON.stringify(newContact), (error) => {
-      if (error) {
-        return console.log("error :", error);
-      }
-    });
-  });
+  const contacts = await listContacts();
+  const id = randomUUID();
+  const newContacts = contacts.concat({ id, name, email, phone });
+  await writeFile(contactsPath, JSON.stringify(newContacts));
+  return newContacts;
 }
 
-function addContact(name, email, phone) {
-  fs.readFile(contactsPath, "utf-8", (error, data) => {
-    if (error) {
-      return console.log(error);
-    }
+async function removeContact(contactId) {
+  const contacts = await listContacts();
 
-    const contacts = JSON.parse(data);
+  if (contacts.some((el) => el.id == contactId)) {
+    const filteredContacts = contacts.filter((el) => el.id != contactId);
+    await writeFile(contactsPath, JSON.stringify(filteredContacts));
+    return filteredContacts;
+  }
 
-    contacts.push({
-      id: contacts.length + 1,
-      name: name,
-      email: email,
-      phone: phone,
-    });
-
-    console.log("Contacts added successfully:  ");
-    console.table(contacts);
-
-    fs.writeFile(contactsPath, JSON.stringify(contacts), (error) => {
-      if (error) {
-        return console.log(error);
-      }
-    });
-  });
+  throw new Error(`Contact with id: ${contactId} not found. Try different id.`);
 }
 
 module.exports = {
