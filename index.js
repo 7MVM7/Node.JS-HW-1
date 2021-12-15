@@ -1,33 +1,64 @@
-const contacts = require("./contacts");
 const { Command } = require("commander");
+const {
+  listContacts,
+  getContactById,
+  removeContact,
+  addContact,
+} = require("./contacts");
+
 const program = new Command();
 program
   .option("-a, --action <type>", "choose action")
-  .option("-i, --id <type>", " id")
-  .option("-n, --name <type>", " name")
-  .option("-e, --email <type>", "email")
-  .option("-p, --phone <type>", " phone");
+  .option("-i, --id <type>", "user id")
+  .option("-n, --name <type>", "user name")
+  .option("-e, --email <type>", "user email")
+  .option("-p, --phone <type>", "user phone");
 
 program.parse(process.argv);
 
 const argv = program.opts();
 
-function invokeAction({ action, id, name, email, phone }) {
+async function invokeAction({ action, id, name, email, phone }) {
   switch (action) {
     case "list":
-      contacts.listContacts();
+      try {
+        const contacts = await listContacts();
+        console.log("Here is your contacts.");
+        console.table(contacts);
+      } catch (error) {
+        console.error("Something went wrong, please try again.");
+      }
       break;
 
     case "get":
-      contacts.getContactById(id);
+      try {
+        const contact = await getContactById(id);
+        console.log(`Contact found:`, contact);
+      } catch (error) {
+        console.error(error.message);
+      }
       break;
 
     case "add":
-      contacts.addContact(name, email, phone);
+      try {
+        const newContacts = await addContact(name, email, phone);
+        console.log("Contact was succesfully added to your contacts.");
+        console.table(newContacts);
+      } catch (error) {
+        console.error(error.message);
+      }
       break;
 
     case "remove":
-      contacts.removeContact(id);
+      try {
+        const filteredContacts = await removeContact(id);
+        console.log(
+          `Contact with id: ${id} was succesfully deleted from your contacts.`
+        );
+        console.table(filteredContacts);
+      } catch (error) {
+        console.error(error.message);
+      }
       break;
 
     default:
