@@ -1,69 +1,25 @@
-const { Command } = require("commander");
-const {
-  listContacts,
-  getContactById,
-  removeContact,
-  addContact,
-} = require("./contacts");
+const express = require("express");
+const logger = require("morgan");
+const cors = require("cors");
 
-const program = new Command();
-program
-  .option("-a, --action <type>", "choose action")
-  .option("-i, --id <type>", "user id")
-  .option("-n, --name <type>", "user name")
-  .option("-e, --email <type>", "user email")
-  .option("-p, --phone <type>", "user phone");
+const contactsRouter = require("./routes/api/contacts");
 
-program.parse(process.argv);
+const app = express();
 
-const argv = program.opts();
+const formatsLogger = app.get("env") === "development" ? "dev" : "short";
 
-async function invokeAction({ action, id, name, email, phone }) {
-  switch (action) {
-    case "list":
-      try {
-        const contacts = await listContacts();
-        console.log("Here is your contacts.");
-        console.table(contacts);
-      } catch (error) {
-        console.error("Something went wrong, please try again.");
-      }
-      break;
+app.use(logger(formatsLogger));
+app.use(cors());
+app.use(express.json());
 
-    case "get":
-      try {
-        const contact = await getContactById(id);
-        console.log(`Contact found:`, contact);
-      } catch (error) {
-        console.error(error.message);
-      }
-      break;
+app.use("/api/contacts", contactsRouter);
 
-    case "add":
-      try {
-        const newContacts = await addContact(name, email, phone);
-        console.log("Contact was succesfully added to your contacts.");
-        console.table(newContacts);
-      } catch (error) {
-        console.error(error.message);
-      }
-      break;
+app.use((_req, res) => {
+  res.status(404).json({ message: "Not found" });
+});
 
-    case "remove":
-      try {
-        const filteredContacts = await removeContact(id);
-        console.log(
-          `Contact with id: ${id} was succesfully deleted from your contacts.`
-        );
-        console.table(filteredContacts);
-      } catch (error) {
-        console.error(error.message);
-      }
-      break;
+app.use((err, _req, res, _next) => {
+  res.status(err.status || 500).json({ message: err.message });
+});
 
-    default:
-      console.warn("\x1B[31m Unknown action type!");
-  }
-}
-
-invokeAction(argv);
+module.exports = app;
