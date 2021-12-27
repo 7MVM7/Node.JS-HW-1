@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": " node app",
-    "start:dev": "nodemon app",
+    "start": " node server",
+    "start:dev": "nodemon server",
     "lint": "eslint **/*.{js,json}",
     "lint:fix": "eslint --fix **/*.{js,json}",
     "dev:debug": "node --inspect ./bin/server.js"
@@ -12,10 +12,12 @@
   "dependencies": {
     "cors": "2.8.5",
     "cross-env": "7.0.3",
+    "dotenv": "^10.0.0",
     "eslint-config-prettier": "^7.2.0",
     "express": "4.17.1",
     "joi": "17.4.0",
     "lowdb": "1.0.0",
+    "mongoose": "^6.1.3",
     "morgan": "1.10.0",
     "npm-merge-driver": "^2.3.6",
     "uuid": "8.3.2"
