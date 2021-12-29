@@ -6,30 +6,30 @@ const contactSchema = Schema(
     name: {
       type: String,
       required: [true, "Set name for contact"],
-      minlength: 3,
     },
     email: {
       type: String,
-      required: true,
-      minlength: 6,
     },
     phone: {
       type: String,
-      required: true,
     },
-    favourite: {
+    favorite: {
       type: Boolean,
       default: false,
     },
   },
-  { versionKey: false, timestamps: true }
+  { versionKey: false }
 );
 
 const joiSchema = Joi.object({
-  name: Joi.string().min(2).required(),
-  email: Joi.string().min(6).required(),
-  phone: Joi.string().min(7).required(),
-  favourite: Joi.bool,
+  name: Joi.string().min(1).required(),
+  email: Joi.string().min(1).required(),
+  phone: Joi.string().min(1).required(),
+  favorite: Joi.boolean(),
+});
+
+const updateActiveSchema = Joi.object({
+  favorite: Joi.boolean().required(),
 });
 
 const Contact = model("contact", contactSchema);
@@ -37,4 +37,5 @@ const Contact = model("contact", contactSchema);
 module.exports = {
   Contact,
   joiSchema,
+  updateActiveSchema,
 };
