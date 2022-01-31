@@ -5,7 +5,7 @@ const Jimp = require("jimp");
 const { User } = require("../../models");
 const avatarDir = path.join(__dirname, "../..", "public/avatars");
 
-const addAvatar = async (req, res) => {
+const avatar = async (req, res) => {
   try {
     const { path: tempStorage, originalname } = req.file;
     const id = req.user._id;
@@ -27,4 +27,4 @@ const addAvatar = async (req, res) => {
     throw error;
   }
 };
-module.exports = addAvatar;
+module.exports = avatar;
