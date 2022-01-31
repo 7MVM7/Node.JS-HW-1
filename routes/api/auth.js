@@ -17,5 +17,9 @@ router.post(
 );
 router.post("/logout", authenticate, ctrlWrapper(usersControllers.logout));
 router.get("/current", authenticate, ctrlWrapper(usersControllers.current));
-
+router.patch(
+  "/avatar",
+  [authenticate, upload.single("avatar")],
+  usersControllers.avatar
+);
 module.exports = router;
