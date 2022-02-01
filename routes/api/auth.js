@@ -2,7 +2,12 @@ const express = require("express");
 const router = express.Router();
 
 const { joiSchema } = require("../../models/user");
-const { ctrlWrapper, validation, authenticate } = require("../../middlewares");
+const {
+  ctrlWrapper,
+  validation,
+  authenticate,
+  upload,
+} = require("../../middlewares");
 const { usersControllers } = require("../../controllers");
 
 router.post(
