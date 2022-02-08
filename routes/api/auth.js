@@ -15,6 +15,10 @@ router.post(
   validation(joiSchema),
   ctrlWrapper(usersControllers.signup)
 );
+
+router.get("/verify/:verificationToken", usersControllers.verify);
+router.post("/verify", usersControllers.emailVerification);
+
 router.post(
   "/login",
   validation(joiSchema),
@@ -23,7 +27,7 @@ router.post(
 router.post("/logout", authenticate, ctrlWrapper(usersControllers.logout));
 router.get("/current", authenticate, ctrlWrapper(usersControllers.current));
 router.patch(
-  "/avatar",
+  "/avatars",
   [authenticate, upload.single("avatar")],
   usersControllers.avatar
 );

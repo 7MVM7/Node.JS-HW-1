@@ -5,8 +5,9 @@ const { successfull } = require("../../status");
 const updateContact = async (req, res) => {
   const { contactId } = req.params;
   const { favorite } = req.body;
+  const userId = req.user.id;
   const result = await Contact.findByIdAndUpdate(
-    contactId,
+    { _id: contactId, owner: userId },
     { favorite },
     { new: true }
   );
