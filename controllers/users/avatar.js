@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 const path = require("path");
 const fs = require("fs/promises");
 const Jimp = require("jimp");
@@ -24,6 +23,7 @@ const avatar = async (req, res) => {
       result: avatarURL,
     });
   } catch (error) {
+    // eslint-disable-next-line no-undef
     await fs.unlink(tempStorage);
     throw error;
   }
